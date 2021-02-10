@@ -1,0 +1,27 @@
+services:
+    _instanceof:
+        Symfony\Component\EventDispatcher\EventSubscriberInterface:
+            tags: [ 'app.event_subscriber' ]
+
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    App\:
+        resource: '../src/*'
+
+    App\Controller\:
+        resource: '../src/Controller/*'
+        public: true
+
+    App\Listener\OrderSmsListener:
+        tags:
+            -   name: app.event_listener
+                event: order.after_insert
+                method: sendSmsToCustomer
+                priority: 2
+
+    Symfony\Component\EventDispatcher\EventDispatcher: ~
+
+    Symfony\Contracts\EventDispatcher\EventDispatcherInterface:
+        alias: Symfony\Component\EventDispatcher\EventDispatcher
