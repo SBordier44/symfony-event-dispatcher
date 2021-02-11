@@ -11,13 +11,8 @@ use App\Texter\SmsTexter;
 
 class OrderSmsListener
 {
-    private SmsTexter $texter;
-    private Logger $logger;
-
-    public function __construct(SmsTexter $texter, Logger $logger)
+    public function __construct(private SmsTexter $texter, private Logger $logger)
     {
-        $this->texter = $texter;
-        $this->logger = $logger;
     }
 
     public function sendSmsToCustomer(OrderEvent $event): void
@@ -27,6 +22,7 @@ class OrderSmsListener
         $sms = new Sms();
         $sms->setNumber($order->getPhoneNumber())
             ->setText("Merci pour votre commande de {$order->getQuantity()} {$order->getProduct()} !");
+
         $this->texter->send($sms);
 
         $this->logger->log("SMS de confirmation envoyé à {$order->getPhoneNumber()} !");

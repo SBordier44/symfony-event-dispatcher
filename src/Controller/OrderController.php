@@ -12,15 +12,8 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 class OrderController
 {
 
-    protected Database $database;
-    private EventDispatcherInterface $dispatcher;
-
-    public function __construct(
-        Database $database,
-        EventDispatcherInterface $eventDispatcher
-    ) {
-        $this->database = $database;
-        $this->dispatcher = $eventDispatcher;
+    public function __construct(protected Database $database, private EventDispatcherInterface $eventDispatcher)
+    {
     }
 
     public function displayOrderForm(): void
@@ -36,10 +29,10 @@ class OrderController
             ->setEmail($_POST['email'])
             ->setPhoneNumber($_POST['phone']);
 
-        $this->dispatcher->dispatch(new OrderEvent($order), OrderEvent::BEFORE_INSERT);
+        $this->eventDispatcher->dispatch(new OrderEvent($order), OrderEvent::BEFORE_INSERT);
 
         $this->database->insertOrder($order);
 
-        $this->dispatcher->dispatch(new OrderEvent($order), OrderEvent::AFTER_INSERT);
+        $this->eventDispatcher->dispatch(new OrderEvent($order), OrderEvent::AFTER_INSERT);
     }
 }

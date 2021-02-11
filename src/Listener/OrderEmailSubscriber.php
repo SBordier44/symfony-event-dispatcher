@@ -12,15 +12,14 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class OrderEmailSubscriber implements EventSubscriberInterface
 {
-    private Mailer $mailer;
-    private Logger $logger;
-
-    public function __construct(Mailer $mailer, Logger $logger)
+    public function __construct(private Mailer $mailer, private Logger $logger)
     {
-        $this->mailer = $mailer;
-        $this->logger = $logger;
     }
 
+    #[\JetBrains\PhpStorm\ArrayShape([
+        OrderEvent::BEFORE_INSERT => 'string[]',
+        OrderEvent::AFTER_INSERT => 'array[]'
+    ])]
     public static function getSubscribedEvents(): array
     {
         return [
@@ -35,13 +34,13 @@ class OrderEmailSubscriber implements EventSubscriberInterface
     {
         $order = $event->getOrder();
         $email = new Email();
-        $email->setSubject("Commande en cours")
+        $email->setSubject('Commande en cours')
             ->setBody(
                 "Merci de vérifier le stock pour le produit {$order->getProduct()} 
                 et la quantité {$order->getQuantity()} !"
             )
-            ->setTo("stock@maboutique.com")
-            ->setFrom("web@maboutique.com");
+            ->setTo('stock@maboutique.com')
+            ->setFrom('web@maboutique.com');
 
         $this->mailer->send($email);
 
@@ -53,9 +52,9 @@ class OrderEmailSubscriber implements EventSubscriberInterface
         $order = $event->getOrder();
 
         $email = new Email();
-        $email->setSubject("Commande confirmée")
+        $email->setSubject('Commande confirmée')
             ->setBody("Merci pour votre commande de {$order->getQuantity()} {$order->getProduct()} !")
-            ->setFrom("web@maboutique.com")
+            ->setFrom('web@maboutique.com')
             ->setTo($order->getEmail());
 
         $this->mailer->send($email);
